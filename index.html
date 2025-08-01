@@ -15,6 +15,7 @@
       height: 100vh;
       margin: 0;
       text-align: center;
+      position: relative;
     }
 
     h1 {
@@ -27,18 +28,34 @@
       margin: 20px 0;
     }
 
-    button {
+    #tapButton {
       background-color: #2ecc71;
       border: none;
-      padding: 15px 30px;
-      font-size: 1.2em;
-      border-radius: 10px;
+      padding: 60px;
+      font-size: 1.5em;
+      border-radius: 50%;
       cursor: pointer;
       transition: 0.2s;
+      width: 160px;
+      height: 160px;
     }
 
-    button:hover {
+    #tapButton:hover {
       background-color: #27ae60;
+    }
+
+    .normal-button {
+      background-color: transparent;
+      border: none;
+      color: #fff;
+      padding: 8px;
+      text-align: left;
+      cursor: pointer;
+      font-size: 1em;
+    }
+
+    .normal-button:hover {
+      background: #333;
     }
 
     #message {
@@ -48,47 +65,26 @@
       min-height: 1.2em;
     }
 
-    /* Menu button */
-    #menu-btn {
+    #menu {
       position: fixed;
       top: 10px;
       left: 10px;
-      font-size: 2em;
-      background: none;
-      border: none;
-      color: white;
+      font-size: 28px;
       cursor: pointer;
-      z-index: 1000;
+      user-select: none;
     }
 
-    #menu {
+    .dropdown {
       position: fixed;
       top: 50px;
       left: 10px;
       background: #222;
-      border-radius: 10px;
-      padding: 10px;
+      border: 1px solid #444;
+      border-radius: 8px;
       display: none;
       flex-direction: column;
-      gap: 10px;
-      z-index: 999;
-      box-shadow: 0 0 10px rgba(0,0,0,0.5);
-    }
-
-    #menu button, #menu a {
-      background: #333;
-      color: white;
-      border: none;
+      z-index: 1000;
       padding: 10px;
-      border-radius: 8px;
-      text-align: left;
-      cursor: pointer;
-      text-decoration: none;
-      display: block;
-    }
-
-    #menu button:hover, #menu a:hover {
-      background: #444;
     }
 
     .modal {
@@ -99,158 +95,141 @@
       background: #222;
       padding: 20px;
       border-radius: 10px;
-      z-index: 1001;
       display: none;
-      color: white;
-      max-width: 90%;
+      z-index: 1001;
+      width: 80%;
+      max-width: 400px;
     }
 
     .modal h2 {
       margin-top: 0;
     }
 
-    .modal button {
-      margin-top: 10px;
-      background: #e74c3c;
+    .close {
+      float: right;
+      cursor: pointer;
     }
 
-    .light-theme {
-      background: #eee;
-      color: #000;
-    }
-
-    .light-theme button {
-      background: #3498db;
-      color: white;
-    }
-
-    .light-theme button:hover {
-      background: #2980b9;
-    }
-
-    .light-theme #menu {
-      background: #ddd;
-    }
-
-    .light-theme #menu button {
-      background: #ccc;
-      color: black;
-    }
-
-    .light-theme #menu button:hover {
-      background: #bbb;
-    }
-
-    .light-theme .modal {
-      background: #ddd;
-      color: black;
+    #version {
+      position: fixed;
+      bottom: 5px;
+      right: 10px;
+      font-size: 0.8em;
+      color: #888;
+      z-index: 500;
+      pointer-events: none;
     }
   </style>
 </head>
 <body>
 
-  <!-- Меню -->
-  <button id="menu-btn">⋮</button>
-  <div id="menu">
-    <button onclick="openModal('settings')">⚙ Настройки</button>
-    <button onclick="openModal('about')">ℹ Об игре</button>
-    <button onclick="openModal('profile')">👤 Профиль</button>
-    <a href="https://t.me/TapiX_NEWS" target="_blank">📢 Канал новостей</a>
+  <div id="menu">⋮</div>
+
+  <div class="dropdown" id="dropdown">
+    <button class="normal-button" onclick="showModal('settings')">⚙ Настройки</button>
+    <button class="normal-button" onclick="showModal('about')">ℹ Об игре</button>
+    <button class="normal-button" onclick="showModal('profile')">👤 Профиль</button>
+    <button class="normal-button" onclick="window.open('https://t.me/TapiX_NEWS', '_blank')">📢 Новости</button>
   </div>
 
-  <!-- Модальные окна -->
-  <div id="settings-modal" class="modal">
+  <div class="modal" id="modal-settings">
+    <span class="close" onclick="closeModals()">✖</span>
     <h2>Настройки</h2>
-    <button onclick="toggleTheme()">🌗 Сменить тему</button><br>
-    <button onclick="closeModal('settings')">Закрыть</button>
+    <button class="normal-button" onclick="toggleTheme()">🌗 Переключить тему</button>
   </div>
 
-  <div id="about-modal" class="modal">
+  <div class="modal" id="modal-about">
+    <span class="close" onclick="closeModals()">✖</span>
     <h2>Об игре</h2>
-    <p>TapiX - это игра-кликер, в которой вам нужно тапать по кнопке, зарабатывать тем самым очки, и получать достижения. Главная цель этой игры: набрать 1000 очков. Удачи.</p>
-    <button onclick="closeModal('about')">Закрыть</button>
+    <p>TapiX — это игра-кликер, в которой вам нужно тапать по кнопке, зарабатывая очки и получая достижения. Главная цель — набрать 1000 очков. Удачи!</p>
   </div>
 
-  <div id="profile-modal" class="modal">
+  <div class="modal" id="modal-profile">
+    <span class="close" onclick="closeModals()">✖</span>
     <h2>Профиль</h2>
-    <div id="achievements"></div>
-    <button onclick="closeModal('profile')">Закрыть</button>
+    <div id="achievements">Загрузка достижений...</div>
+    <br>
+    <button class="normal-button" onclick="window.open('https://t.me/TapiX_NEWS', '_blank')">🔗 Наш Telegram</button>
   </div>
 
-  <!-- Основная часть игры -->
   <h1>👋 Добро пожаловать в TapiX!</h1>
   <div id="count">0</div>
-  <button onclick="tap()">Тап</button>
+  <button id="tapButton" onclick="tap()">Тап</button>
   <div id="message"></div>
+  <div id="version">v0.2.1</div>
 
   <script>
-    let count = parseInt(localStorage.getItem("tapix_count")) || 0;
-    let achievements = JSON.parse(localStorage.getItem("tapix_achievements")) || [];
-
-    const countEl = document.getElementById("count");
-    const msg = document.getElementById("message");
-    const achEl = document.getElementById("achievements");
-
-    const milestoneMessages = {
-      100: "🎉 Молодец! Но ты можешь и лучше.",
-      500: "💪 А ты серьёзный противник.",
-      1000: "🧠🔥 Поздравляю, ты сломал игру.",
-      5000: "👀 Как ты это делаешь?!",
-      10000: "👨‍💻 Ах ты читер..."
+    let count = parseInt(localStorage.getItem('count')) || 0;
+    let achievements = JSON.parse(localStorage.getItem('achievements')) || {
+      "100": false,
+      "500": false,
+      "1000": false,
+      "5000": false,
+      "10000": false
     };
+
+    document.getElementById('count').innerText = count;
+    updateAchievements();
 
     function tap() {
       count++;
-      countEl.innerText = count;
-      localStorage.setItem("tapix_count", count);
+      document.getElementById('count').innerText = count;
+      localStorage.setItem('count', count);
 
-      if (milestoneMessages[count] && !achievements.includes(count)) {
-        msg.innerText = milestoneMessages[count];
-        achievements.push(count);
-        localStorage.setItem("tapix_achievements", JSON.stringify(achievements));
+      const msg = document.getElementById('message');
+
+      if (count >= 10000 && !achievements["10000"]) {
+        msg.innerText = "👨‍💻 Ах ты читер...";
+        achievements["10000"] = true;
+      } else if (count >= 5000 && !achievements["5000"]) {
+        msg.innerText = "👀 Как ты это делаешь?!";
+        achievements["5000"] = true;
+      } else if (count >= 1000 && !achievements["1000"]) {
+        msg.innerText = "🧠🔥 Поздравляю, ты сломал игру.";
+        achievements["1000"] = true;
+      } else if (count >= 500 && !achievements["500"]) {
+        msg.innerText = "💪 А ты серьёзный противник.";
+        achievements["500"] = true;
+      } else if (count >= 100 && !achievements["100"]) {
+        msg.innerText = "🎉 Молодец! Но ты можешь и лучше.";
+        achievements["100"] = true;
       }
+
+      localStorage.setItem('achievements', JSON.stringify(achievements));
+      updateAchievements();
     }
 
-    function openModal(name) {
-      document.getElementById(name + '-modal').style.display = 'block';
-      if (name === 'profile') showAchievements();
+    function updateAchievements() {
+      const list = [];
+      if (achievements["100"]) list.push("🎉 Молодец! Но ты можешь и лучше.");
+      if (achievements["500"]) list.push("💪 А ты серьёзный противник.");
+      if (achievements["1000"]) list.push("🧠🔥 Поздравляю, ты сломал игру.");
+      if (achievements["5000"]) list.push("👀 Как ты это делаешь?!");
+      if (achievements["10000"]) list.push("👨‍💻 Ах ты читер...");
+      document.getElementById("achievements").innerText = list.length > 0 ? list.join("\n") : "Нет достижений.";
     }
 
-    function closeModal(name) {
-      document.getElementById(name + '-modal').style.display = 'none';
+    function showModal(id) {
+      closeModals();
+      document.getElementById(`modal-${id}`).style.display = 'block';
     }
 
-    function toggleTheme() {
-      document.body.classList.toggle("light-theme");
+    function closeModals() {
+      document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
     }
 
-    function showAchievements() {
-      achEl.innerHTML = "";
-      if (achievements.length === 0) {
-        achEl.innerHTML = "<p>Пока нет достижений.</p>";
-        return;
-      }
-      achievements.forEach(val => {
-        const p = document.createElement("p");
-        p.textContent = milestoneMessages[val];
-        achEl.appendChild(p);
-      });
-      const link = document.createElement("a");
-      link.href = "https://t.me/TapiX_NEWS";
-      link.target = "_blank";
-      link.innerHTML = "<button>📢 Перейти в Telegram-канал</button>";
-      achEl.appendChild(link);
-    }
+    const menuBtn = document.getElementById('menu');
+    const dropdown = document.getElementById('dropdown');
 
-    // Переключение меню
-    document.getElementById("menu-btn").addEventListener("click", () => {
-      const menu = document.getElementById("menu");
-      menu.style.display = (menu.style.display === "flex") ? "none" : "flex";
+    menuBtn.addEventListener('click', () => {
+      dropdown.style.display = dropdown.style.display === 'flex' ? 'none' : 'flex';
     });
 
-    // При загрузке страницы
-    countEl.innerText = count;
+    function toggleTheme() {
+      const dark = document.body.style.background === "rgb(255, 255, 255)";
+      document.body.style.background = dark ? "#111" : "#fff";
+      document.body.style.color = dark ? "#fff" : "#111";
+    }
   </script>
-
 </body>
   </html>
