@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Tap Game — The Box</title>
+  <style>
+    body {
+      background: #111;
+      color: #fff;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2em;
+      margin-bottom: 20px;
+    }
+
+    #count {
+      font-size: 3em;
+      margin: 20px 0;
+    }
+
+    button {
+      background-color: #2ecc71;
+      border: none;
+      padding: 15px 30px;
+      font-size: 1.2em;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      background-color: #27ae60;
+    }
+
+    #message {
+      margin-top: 20px;
+      font-size: 1.2em;
+      color: #f1c40f;
+      min-height: 1.2em;
+    }
+  </style>
+</head>
+<body>
+  <h1>👋 Добро пожаловать в кликер "TapiX"!</h1>
+  <div id="count">0</div>
+  <button onclick="tap()">Тап</button>
+  <div id="message"></div>
+
+  <script>
+    let count = 0;
+    let shown100 = false;
+    let shown500 = false;
+    let shown1000 = false;
+
+    function tap() {
+      count++;
+      document.getElementById('count').innerText = count;
+
+      const msg = document.getElementById('message');
+
+      if (count >= 1000 && !shown1000) {
+        msg.innerText = "🧠🔥 Поздравляю, ты сломал игру.";
+        shown1000 = true;
+      } else if (count >= 500 && !shown500) {
+        msg.innerText = "💪 А ты серьёзный противник.";
+        shown500 = true;
+      } else if (count >= 100 && !shown100) {
+        msg.innerText = "🎉 Молодец! Но ты можешь и лучше.";
+        shown100 = true;
+      }
+    }
+  </script>
+</body>
+</html>
