@@ -35,13 +35,17 @@
       font-size: 1.5em;
       border-radius: 50%;
       cursor: pointer;
-      transition: 0.2s;
+      transition: transform 0.1s ease, background-color 0.2s;
       width: 160px;
       height: 160px;
     }
 
     #tapButton:hover {
       background-color: #27ae60;
+    }
+
+    #tapButton:active {
+      transform: scale(0.85);
     }
 
     .normal-button {
@@ -156,7 +160,7 @@
   <div id="count">0</div>
   <button id="tapButton" onclick="tap()">Тап</button>
   <div id="message"></div>
-  <div id="version">v0.2.1</div>
+  <div id="version">v0.2.2</div>
 
   <script>
     let count = parseInt(localStorage.getItem('count')) || 0;
@@ -232,4 +236,4 @@
     }
   </script>
 </body>
-  </html>
+      </html>
