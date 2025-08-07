@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>TapiX</title>
   <style>
     body {
@@ -72,6 +72,12 @@
       font-size: 28px;
       cursor: pointer;
       user-select: none;
+      transition: transform 0.4s ease;
+    }
+
+    /* Анимация меню */
+    #menu:hover {
+      transform: rotate(90deg);
     }
 
     .dropdown {
@@ -85,6 +91,13 @@
       flex-direction: column;
       z-index: 1000;
       padding: 10px;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .dropdown.show {
+      display: flex;
+      opacity: 1;
     }
 
     .modal {
@@ -177,8 +190,6 @@
     <span class="close" onclick="closeModals()">✖</span>
     <h2>Профиль</h2>
     <div id="achievements">Загрузка достижений...</div>
-    <br>
-    <button class="normal-button" onclick="window.open('https://t.me/TapiX_NEWS', '_blank')">🔗 Наш Telegram</button>
   </div>
 
   <div class="modal" id="modal-reset">
@@ -202,7 +213,7 @@
   <div id="count">0</div>
   <button id="tapButton" onclick="tap()">Тап</button>
   <div id="message"></div>
-  <div id="version">v0.3.2</div>
+  <div id="version">v0.4.1</div>
 
   <script>
     let count = parseInt(localStorage.getItem('count')) || 0;
@@ -211,8 +222,10 @@
       "500": false,
       "1000": false,
       "5000": false,
-      "10000": false
+      "10000": false,
+      "five_seeds": false
     };
+    let usedCodes = JSON.parse(localStorage.getItem("usedPromoCodes")) || [];
 
     document.getElementById('count').innerText = count;
     updateAchievements();
@@ -251,6 +264,7 @@
       if (achievements["1000"]) list.push("🧠🔥 Поздравляю, ты сломал игру.");
       if (achievements["5000"]) list.push("👀 Как ты это делаешь?!");
       if (achievements["10000"]) list.push("👨‍💻 Ах ты читер...");
+      if (achievements["five_seeds"]) list.push("Хмм, что это значит... Надеюсь, это шутка.");
       document.getElementById("achievements").innerText = list.length > 0 ? list.join("\n") : "Нет достижений.";
     }
 
@@ -261,10 +275,13 @@
         "500": false,
         "1000": false,
         "5000": false,
-        "10000": false
+        "10000": false,
+        "five_seeds": false
       };
+      usedCodes = [];
       localStorage.setItem('count', count);
       localStorage.setItem('achievements', JSON.stringify(achievements));
+      localStorage.setItem("usedPromoCodes", JSON.stringify(usedCodes));
       document.getElementById('count').innerText = count;
       document.getElementById('message').innerText = '';
       updateAchievements();
@@ -273,6 +290,8 @@
 
     function showModal(id) {
       closeModals();
+      const dropdown = document.getElementById('dropdown');
+      dropdown.classList.remove('show');
       document.getElementById(`modal-${id}`).style.display = 'block';
     }
 
@@ -284,7 +303,7 @@
     const dropdown = document.getElementById('dropdown');
 
     menuBtn.addEventListener('click', () => {
-      dropdown.style.display = dropdown.style.display === 'flex' ? 'none' : 'flex';
+      dropdown.classList.toggle('show');
     });
 
     function toggleTheme() {
@@ -308,10 +327,9 @@
       "BUBBLETAP": 550,
       "GAMERGRIND": 800,
       "EASYTAP": 100,
-      "FINALHIT": 900
+      "FINALHIT": 900,
+      "221B": 221
     };
-
-    let usedCodes = JSON.parse(localStorage.getItem("usedPromoCodes")) || [];
 
     function applyPromo() {
       const input = document.getElementById("promoInput").value.trim().toUpperCase();
@@ -322,13 +340,26 @@
         return;
       }
 
+      if (input === "FIVEOSEEDS") {
+        msg.innerText = "Вам пришло письмо! Внутри письма 5 апельсиновых зёрнышек и надпись KKK";
+        count = 5;
+        achievements["five_seeds"] = true;
+        if (!usedCodes.includes(input)) usedCodes.push(input);
+        localStorage.setItem('count', count);
+        localStorage.setItem('achievements', JSON.stringify(achievements));
+        localStorage.setItem("usedPromoCodes", JSON.stringify(usedCodes));
+        updateAchievements();
+        document.getElementById('count').innerText = count;
+        return;
+      }
+
       if (promoCodes[input]) {
         count += promoCodes[input];
-        localStorage.setItem('count', count);
-        document.getElementById('count').innerText = count;
         msg.innerText = `🎉 +${promoCodes[input]} очков!`;
         usedCodes.push(input);
+        localStorage.setItem('count', count);
         localStorage.setItem("usedPromoCodes", JSON.stringify(usedCodes));
+        document.getElementById('count').innerText = count;
       } else {
         msg.innerText = "❌ Неверный промокод.";
       }
