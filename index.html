@@ -170,6 +170,7 @@
     <button class="normal-button" onclick="showModal('profile')">👤 Профиль</button>
     <button class="normal-button" onclick="showModal('reset')">⛔ Сброс</button>
     <button class="normal-button" onclick="showModal('promo')">🎁 Промокод</button>
+    <button class="normal-button" onclick="showModal('shop')">🛒 Магазин</button>
     <button class="normal-button" onclick="window.open('https://t.me/TapiX_NEWS', '_blank')">📢 Новости</button>
   </div>
 
@@ -209,11 +210,21 @@
     <div id="promoMessage" style="margin-top: 10px;"></div>
   </div>
 
+  <!-- Магазин -->
+  <div class="modal" id="modal-shop">
+    <span class="close" onclick="closeModals()">✖</span>
+    <h2>Магазин бустов</h2>
+    <button class="normal-button" onclick="buyBoost('x2', 1200)">x2 — 1200 очков</button>
+    <button class="normal-button" onclick="buyBoost('x5', 2500)">x5 — 2500 очков</button>
+    <button class="normal-button" onclick="buyBoost('x10', 5000)">x10 — 5000 очков</button>
+    <div id="shopMessage" style="margin-top:10px;"></div>
+  </div>
+
   <h1>👋 Добро пожаловать в TapiX!</h1>
   <div id="count">0</div>
   <button id="tapButton" onclick="tap()">Тап</button>
   <div id="message"></div>
-  <div id="version">v0.4.1</div>
+  <div id="version">v1.0.1</div>
 
   <script>
     let count = parseInt(localStorage.getItem('count')) || 0;
@@ -226,12 +237,22 @@
       "five_seeds": false
     };
     let usedCodes = JSON.parse(localStorage.getItem("usedPromoCodes")) || [];
+    let boosts = JSON.parse(localStorage.getItem("boosts")) || {
+      "x2": false,
+      "x5": false,
+      "x10": false
+    };
 
     document.getElementById('count').innerText = count;
     updateAchievements();
 
     function tap() {
-      count++;
+      let increment = 1;
+      if(boosts["x2"]) increment *= 2;
+      if(boosts["x5"]) increment *= 5;
+      if(boosts["x10"]) increment *= 10;
+
+      count += increment;
       document.getElementById('count').innerText = count;
       localStorage.setItem('count', count);
       const msg = document.getElementById('message');
@@ -279,9 +300,15 @@
         "five_seeds": false
       };
       usedCodes = [];
+      boosts = {
+        "x2": false,
+        "x5": false,
+        "x10": false
+      };
       localStorage.setItem('count', count);
       localStorage.setItem('achievements', JSON.stringify(achievements));
       localStorage.setItem("usedPromoCodes", JSON.stringify(usedCodes));
+      localStorage.setItem("boosts", JSON.stringify(boosts));
       document.getElementById('count').innerText = count;
       document.getElementById('message').innerText = '';
       updateAchievements();
@@ -363,6 +390,24 @@
       } else {
         msg.innerText = "❌ Неверный промокод.";
       }
+    }
+
+    function buyBoost(type, price) {
+      const msg = document.getElementById("shopMessage");
+      if(count < price) {
+        msg.innerText = "❌ Недостаточно очков для покупки.";
+        return;
+      }
+      if(boosts[type]) {
+        msg.innerText = "❗ Буст уже куплен.";
+        return;
+      }
+      count -= price;
+      boosts[type] = true;
+      localStorage.setItem('count', count);
+      localStorage.setItem("boosts", JSON.stringify(boosts));
+      document.getElementById('count').innerText = count;
+      msg.innerText = `🎉 Вы купили буст ${type}!`;
     }
   </script>
 </body>
