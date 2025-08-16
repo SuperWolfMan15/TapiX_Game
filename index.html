@@ -1,414 +1,421 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <title>TapiX</title>
-  <style>
-    body {
-      background: #111;
-      color: #fff;
-      font-family: sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-      text-align: center;
-      position: relative;
-    }
+<meta charset="UTF-8" />
+<title>TapiX</title>
+<style>
+body {
+  background: #111;
+  color: #fff;
+  font-family: sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  margin: 0;
+  text-align: center;
+  position: relative;
+}
+h1 { font-size: 2em; margin-bottom: 20px; }
+#count { font-size: 3em; margin: 20px 0; }
+#tapButton {
+  background-color: #2ecc71;
+  border: none;
+  padding: 60px;
+  font-size: 1.5em;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+  width: 160px;
+  height: 160px;
+}
+#tapButton:active { transform: scale(0.9); }
 
-    h1 {
-      font-size: 2em;
-      margin-bottom: 20px;
-    }
+.normal-button {
+  background-color: transparent;
+  border: none;
+  color: #fff;
+  padding: 8px;
+  text-align: left;
+  cursor: pointer;
+  font-size: 1em;
+}
+.normal-button:hover { background: #333; }
 
-    #count {
-      font-size: 3em;
-      margin: 20px 0;
-    }
+#message { margin-top: 20px; font-size: 1.2em; color: #f1c40f; min-height: 1.2em; }
 
-    #tapButton {
-      background-color: #2ecc71;
-      border: none;
-      padding: 60px;
-      font-size: 1.5em;
-      border-radius: 50%;
-      cursor: pointer;
-      transition: transform 0.1s ease;
-      width: 160px;
-      height: 160px;
-    }
+#menu {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  font-size: 32px;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.2s ease;
+}
 
-    #tapButton:active {
-      transform: scale(0.9);
-    }
+.dropdown {
+  position: fixed;
+  top: 50px;
+  left: 10px;
+  background: #222;
+  border: 1px solid #444;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+  padding: 10px;
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+  opacity: 0;
+}
 
-    .normal-button {
-      background-color: transparent;
-      border: none;
-      color: #fff;
-      padding: 8px;
-      text-align: left;
-      cursor: pointer;
-      font-size: 1em;
-    }
+.dropdown.show {
+  transform: scaleY(1);
+  opacity: 1;
+}
 
-    .normal-button:hover {
-      background: #333;
-    }
+/* Миндальные окна */
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #222;
+  padding: 20px;
+  border-radius: 10px;
+  display: none;
+  z-index: 1001;
+  width: 80%;
+  max-width: 400px;
+}
+.modal h2 { margin-top: 0; }
+.close { float: right; cursor: pointer; }
+.modal-buttons { display: flex; justify-content: space-between; margin-top: 20px; }
+.modal-buttons button { flex: 1; margin: 0 5px; padding: 10px; font-size: 1em; cursor: pointer; border-radius: 5px; border: none; }
+.btn-confirm { background-color: #e74c3c; color: white; }
+.btn-cancel { background-color: #2ecc71; color: white; }
 
-    #message {
-      margin-top: 20px;
-      font-size: 1.2em;
-      color: #f1c40f;
-      min-height: 1.2em;
-    }
+#version { position: fixed; bottom: 5px; right: 10px; font-size: 0.8em; color: #888; z-index: 500; pointer-events: none; }
 
-    #menu {
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      font-size: 28px;
-      cursor: pointer;
-      user-select: none;
-      transition: transform 0.4s ease;
-    }
-
-    /* Анимация меню */
-    #menu:hover {
-      transform: rotate(90deg);
-    }
-
-    .dropdown {
-      position: fixed;
-      top: 50px;
-      left: 10px;
-      background: #222;
-      border: 1px solid #444;
-      border-radius: 8px;
-      display: none;
-      flex-direction: column;
-      z-index: 1000;
-      padding: 10px;
-      opacity: 0;
-      transition: opacity 0.5s ease;
-    }
-
-    .dropdown.show {
-      display: flex;
-      opacity: 1;
-    }
-
-    .modal {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #222;
-      padding: 20px;
-      border-radius: 10px;
-      display: none;
-      z-index: 1001;
-      width: 80%;
-      max-width: 400px;
-    }
-
-    .modal h2 {
-      margin-top: 0;
-    }
-
-    .close {
-      float: right;
-      cursor: pointer;
-    }
-
-    .modal-buttons {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 20px;
-    }
-
-    .modal-buttons button {
-      flex: 1;
-      margin: 0 5px;
-      padding: 10px;
-      font-size: 1em;
-      cursor: pointer;
-      border-radius: 5px;
-      border: none;
-    }
-
-    .btn-confirm {
-      background-color: #e74c3c;
-      color: white;
-    }
-
-    .btn-cancel {
-      background-color: #2ecc71;
-      color: white;
-    }
-
-    #version {
-      position: fixed;
-      bottom: 5px;
-      right: 10px;
-      font-size: 0.8em;
-      color: #888;
-      z-index: 500;
-      pointer-events: none;
-    }
-  </style>
+/* Шарики */
+.ball {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #ff4d4d, #cc0000);
+  color: #fff;
+  font-weight: bold;
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  width: 60px;
+  height: 60px;
+  user-select: none;
+  transition: transform 0.2s ease;
+}
+.particle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff4d4d;
+  pointer-events: none;
+}
+#ballScore { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); font-size: 1.5em; }
+#backButton {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  padding: 8px 12px;
+  background: #2ecc71;
+  color: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1em;
+}
+</style>
 </head>
 <body>
+<div id="menu">⋮</div>
+<div class="dropdown" id="dropdown">
+  <button class="normal-button" onclick="showModal('settings')">⚙ Настройки</button>
+  <button class="normal-button" onclick="showModal('about')">ℹ Об игре</button>
+  <button class="normal-button" onclick="showModal('profile')">👤 Профиль</button>
+  <button class="normal-button" onclick="showModal('reset')">⛔ Сброс</button>
+  <button class="normal-button" onclick="showModal('promo')">🎁 Промокод</button>
+  <button class="normal-button" onclick="showModal('shop')">🛒 Магазин</button>
+  <button class="normal-button" onclick="window.open('https://t.me/TapiX_NEWS', '_blank')">📢 Новости</button>
+  <button class="normal-button" onclick="startBallsEvent()">🔴 Ивент "Шарики"</button>
+</div>
 
-  <div id="menu">⋮</div>
+<!-- Миндальные окна -->
+<div class="modal" id="modal-settings">
+  <span class="close" onclick="closeModals()">✖</span>
+  <h2>Настройки</h2>
+  <button class="normal-button" onclick="toggleTheme()">🌗 Переключить тему</button>
+</div>
 
-  <div class="dropdown" id="dropdown">
-    <button class="normal-button" onclick="showModal('settings')">⚙ Настройки</button>
-    <button class="normal-button" onclick="showModal('about')">ℹ Об игре</button>
-    <button class="normal-button" onclick="showModal('profile')">👤 Профиль</button>
-    <button class="normal-button" onclick="showModal('reset')">⛔ Сброс</button>
-    <button class="normal-button" onclick="showModal('promo')">🎁 Промокод</button>
-    <button class="normal-button" onclick="showModal('shop')">🛒 Магазин</button>
-    <button class="normal-button" onclick="window.open('https://t.me/TapiX_NEWS', '_blank')">📢 Новости</button>
+<div class="modal" id="modal-about">
+  <span class="close" onclick="closeModals()">✖</span>
+  <h2>Об игре</h2>
+  <p>TapiX — это игра-кликер, в которой вам нужно тапать по кнопке, зарабатывать очки и получать достижения. Главная цель — набрать 10000 очков. Удачи!</p>
+</div>
+
+<div class="modal" id="modal-profile">
+  <span class="close" onclick="closeModals()">✖</span>
+  <h2>Профиль</h2>
+  <div id="achievements">Загрузка достижений...</div>
+</div>
+
+<div class="modal" id="modal-reset">
+  <span class="close" onclick="closeModals()">✖</span>
+  <h2>Сбросить прогресс?</h2>
+  <div class="modal-buttons">
+    <button class="btn-confirm" onclick="resetProgress()">Да</button>
+    <button class="btn-cancel" onclick="closeModals()">Нет</button>
   </div>
+</div>
 
-  <!-- Миндальные окна -->
-  <div class="modal" id="modal-settings">
-    <span class="close" onclick="closeModals()">✖</span>
-    <h2>Настройки</h2>
-    <button class="normal-button" onclick="toggleTheme()">🌗 Переключить тему</button>
-  </div>
+<div class="modal" id="modal-promo">
+  <span class="close" onclick="closeModals()">✖</span>
+  <h2>Ввести промокод</h2>
+  <input type="text" id="promoInput" placeholder="Введите код" style="width: 100%; padding: 8px; margin-top: 10px; font-size: 1em;">
+  <button class="normal-button" onclick="applyPromo()">✅ Активировать</button>
+  <div id="promoMessage" style="margin-top: 10px;"></div>
+</div>
 
-  <div class="modal" id="modal-about">
-    <span class="close" onclick="closeModals()">✖</span>
-    <h2>Об игре</h2>
-    <p>TapiX — это игра-кликер, в которой вам нужно тапать по кнопке, зарабатывать очки и получать достижения. Главная цель — набрать 10000 очков. Удачи!</p>
-  </div>
+<!-- Магазин -->
+<div class="modal" id="modal-shop">
+  <span class="close" onclick="closeModals()">✖</span>
+  <h2>Магазин бустов</h2>
+  <button class="normal-button" onclick="buyBoost('x2', 1200)">x2 — 1200 очков</button>
+  <button class="normal-button" onclick="buyBoost('x5', 2500)">x5 — 2500 очков</button>
+  <button class="normal-button" onclick="buyBoost('x10', 5000)">x10 — 5000 очков</button>
+  <div id="shopMessage" style="margin-top:10px;"></div>
+</div>
 
-  <div class="modal" id="modal-profile">
-    <span class="close" onclick="closeModals()">✖</span>
-    <h2>Профиль</h2>
-    <div id="achievements">Загрузка достижений...</div>
-  </div>
+<h1 id="welcomeText">👋 Добро пожаловать в TapiX!</h1>
+<div id="count">0</div>
+<button id="tapButton" onclick="tap()">Тап</button>
+<div id="message"></div>
+<div id="version">v1.2.2</div>
 
-  <div class="modal" id="modal-reset">
-    <span class="close" onclick="closeModals()">✖</span>
-    <h2>Сбросить прогресс?</h2>
-    <div class="modal-buttons">
-      <button class="btn-confirm" onclick="resetProgress()">Да</button>
-      <button class="btn-cancel" onclick="closeModals()">Нет</button>
-    </div>
-  </div>
+<div id="ballScore"></div>
+<div id="backButton" style="display:none;" onclick="backToTapiX()">Назад в TapiX</div><script>
+let count = parseInt(localStorage.getItem('count')) || 0;
+let achievements = JSON.parse(localStorage.getItem('achievements')) || {
+  "100": false,
+  "500": false,
+  "1000": false,
+  "5000": false,
+  "10000": false,
+  "five_seeds": false
+};
+let usedCodes = JSON.parse(localStorage.getItem("usedPromoCodes")) || [];
+let boosts = JSON.parse(localStorage.getItem("boosts")) || {
+  "x2": false,
+  "x5": false,
+  "x10": false
+};
 
-  <div class="modal" id="modal-promo">
-    <span class="close" onclick="closeModals()">✖</span>
-    <h2>Ввести промокод</h2>
-    <input type="text" id="promoInput" placeholder="Введите код" style="width: 100%; padding: 8px; margin-top: 10px; font-size: 1em;">
-    <button class="normal-button" onclick="applyPromo()">✅ Активировать</button>
-    <div id="promoMessage" style="margin-top: 10px;"></div>
-  </div>
+let ballsActive = false;
+let balls = [];
+let ballsScore = 0;
 
-  <!-- Магазин -->
-  <div class="modal" id="modal-shop">
-    <span class="close" onclick="closeModals()">✖</span>
-    <h2>Магазин бустов</h2>
-    <button class="normal-button" onclick="buyBoost('x2', 1200)">x2 — 1200 очков</button>
-    <button class="normal-button" onclick="buyBoost('x5', 2500)">x5 — 2500 очков</button>
-    <button class="normal-button" onclick="buyBoost('x10', 5000)">x10 — 5000 очков</button>
-    <div id="shopMessage" style="margin-top:10px;"></div>
-  </div>
+document.getElementById('count').innerText = count;
+updateAchievements();
 
-  <h1>👋 Добро пожаловать в TapiX!</h1>
-  <div id="count">0</div>
-  <button id="tapButton" onclick="tap()">Тап</button>
-  <div id="message"></div>
-  <div id="version">v1.0.1</div>
+// Основной кликер
+function tap() {
+  if(ballsActive) return;
+  let increment = 1;
+  if(boosts["x2"]) increment *= 2;
+  if(boosts["x5"]) increment *= 5;
+  if(boosts["x10"]) increment *= 10;
 
-  <script>
-    let count = parseInt(localStorage.getItem('count')) || 0;
-    let achievements = JSON.parse(localStorage.getItem('achievements')) || {
-      "100": false,
-      "500": false,
-      "1000": false,
-      "5000": false,
-      "10000": false,
-      "five_seeds": false
-    };
-    let usedCodes = JSON.parse(localStorage.getItem("usedPromoCodes")) || [];
-    let boosts = JSON.parse(localStorage.getItem("boosts")) || {
-      "x2": false,
-      "x5": false,
-      "x10": false
-    };
+  count += increment;
+  document.getElementById('count').innerText = count;
+  localStorage.setItem('count', count);
+  const msg = document.getElementById('message');
 
-    document.getElementById('count').innerText = count;
+  if (count >= 10000 && !achievements["10000"]) { msg.innerText = "👨‍💻 Ах ты читер..."; achievements["10000"]=true; }
+  else if (count >= 5000 && !achievements["5000"]) { msg.innerText = "👀 Как ты это делаешь?!"; achievements["5000"]=true; }
+  else if (count >= 1000 && !achievements["1000"]) { msg.innerText = "🧠🔥 Поздравляю, ты сломал игру."; achievements["1000"]=true; }
+  else if (count >= 500 && !achievements["500"]) { msg.innerText = "💪 А ты серьёзный противник."; achievements["500"]=true; }
+  else if (count >= 100 && !achievements["100"]) { msg.innerText = "🎉 Молодец! Но ты можешь и лучше."; achievements["100"]=true; }
+
+  localStorage.setItem('achievements', JSON.stringify(achievements));
+  updateAchievements();
+}
+
+function updateAchievements() {
+  const list = [];
+  if (achievements["100"]) list.push("🎉 Молодец! Но ты можешь и лучше.");
+  if (achievements["500"]) list.push("💪 А ты серьёзный противник.");
+  if (achievements["1000"]) list.push("🧠🔥 Поздравляю, ты сломал игру.");
+  if (achievements["5000"]) list.push("👀 Как ты это делаешь?!");
+  if (achievements["10000"]) list.push("👨‍💻 Ах ты читер...");
+  if (achievements["five_seeds"]) list.push("Хмм, что это значит... Надеюсь, это шутка.");
+  document.getElementById("achievements").innerText = list.length>0? list.join("\n"):"Нет достижений.";
+}
+
+function resetProgress() {
+  count = 0;
+  achievements = {"100":false,"500":false,"1000":false,"5000":false,"10000":false,"five_seeds":false};
+  usedCodes = [];
+  boosts = {"x2":false,"x5":false,"x10":false};
+  localStorage.setItem('count', count);
+  localStorage.setItem('achievements', JSON.stringify(achievements));
+  localStorage.setItem("usedPromoCodes", JSON.stringify(usedCodes));
+  localStorage.setItem("boosts", JSON.stringify(boosts));
+  document.getElementById('count').innerText = count;
+  document.getElementById('message').innerText = '';
+  updateAchievements();
+  closeModals();
+}
+
+function showModal(id) { closeModals(); document.getElementById('dropdown').classList.remove('show'); document.getElementById(`modal-${id}`).style.display='block'; }
+function closeModals() { document.querySelectorAll('.modal').forEach(m => m.style.display='none'); }
+
+const menuBtn = document.getElementById('menu');
+const dropdown = document.getElementById('dropdown');
+
+menuBtn.addEventListener('click', ()=>{
+  dropdown.classList.toggle('show');
+});
+
+// Плавная анимация меню
+menuBtn.addEventListener('mouseenter', ()=>{ dropdown.style.transition='transform 0.15s ease, opacity 0.15s ease'; });
+menuBtn.addEventListener('mouseleave', ()=>{ dropdown.style.transition='transform 0.15s ease, opacity 0.15s ease'; });
+
+function toggleTheme(){
+  const dark = document.body.style.background==="rgb(255, 255, 255)";
+  document.body.style.background=dark?"#111":"#fff";
+  document.body.style.color=dark?"#fff":"#111";
+}
+
+const promoCodes = {"SUNNYDAY":500,"BITEBYTE":300,"LUCKYCLAP":700,"PIXELRUSH":250,"COZYTAP":400,"TAPWAVE":600,"ZAPBOOM":1000,"QUIETPOWER":350,"TAPSTORM":450,"CLOUDYCODE":150,"NEONTAP":200,"BUBBLETAP":550,"GAMERGRIND":800,"EASYTAP":100,"FINALHIT":900,"221B":221};
+
+function applyPromo(){
+  const input = document.getElementById("promoInput").value.trim().toUpperCase();
+  const msg = document.getElementById("promoMessage");
+  if(usedCodes.includes(input)){ msg.innerText="❗ Этот промокод уже использован."; return; }
+  if(input==="FIVEOSEEDS"){
+    msg.innerText="Вам пришло письмо! Внутри письма 5 апельсиновых зёрнышек и надпись KKK";
+    count=5;
+    achievements["five_seeds"]=true;
+    if(!usedCodes.includes(input)) usedCodes.push(input);
+    localStorage.setItem('count', count);
+    localStorage.setItem('achievements', JSON.stringify(achievements));
+    localStorage.setItem("usedPromoCodes", JSON.stringify(usedCodes));
     updateAchievements();
+    document.getElementById('count').innerText=count;
+    return;
+  }
+  if(promoCodes[input]){
+    count+=promoCodes[input];
+    msg.innerText=`🎉 +${promoCodes[input]} очков!`;
+    usedCodes.push(input);
+    localStorage.setItem('count', count);
+    localStorage.setItem("usedPromoCodes", JSON.stringify(usedCodes));
+    document.getElementById('count').innerText=count;
+  } else { msg.innerText="❌ Неверный промокод."; }
+}
 
-    function tap() {
-      let increment = 1;
-      if(boosts["x2"]) increment *= 2;
-      if(boosts["x5"]) increment *= 5;
-      if(boosts["x10"]) increment *= 10;
+function buyBoost(type,price){
+  const msg = document.getElementById("shopMessage");
+  if(count<price){ msg.innerText="❌ Недостаточно очков для покупки."; return; }
+  if(boosts[type]){ msg.innerText="❗ Буст уже куплен."; return; }
+  count-=price; boosts[type]=true;
+  localStorage.setItem('count', count);
+  localStorage.setItem("boosts", JSON.stringify(boosts));
+  document.getElementById('count').innerText=count;
+  msg.innerText=`🎉 Вы купили буст ${type}!`;
+}
 
-      count += increment;
-      document.getElementById('count').innerText = count;
-      localStorage.setItem('count', count);
-      const msg = document.getElementById('message');
+// --- ИВЕНТ ШАРИКИ ---
+function startBallsEvent(){
+  ballsActive=true;
+  document.getElementById('welcomeText').style.display='none';
+  document.getElementById('tapButton').style.display='none';
+  document.getElementById('count').style.display='none';
+  document.getElementById('message').style.display='none';
+  document.getElementById('dropdown').style.display='none';
+  document.getElementById('backButton').style.display='block';
+  document.getElementById('ballScore').innerText='Очки: 0';
+  ballsScore=0;
+  spawnBalls(5);
+}
 
-      if (count >= 10000 && !achievements["10000"]) {
-        msg.innerText = "👨‍💻 Ах ты читер...";
-        achievements["10000"] = true;
-      } else if (count >= 5000 && !achievements["5000"]) {
-        msg.innerText = "👀 Как ты это делаешь?!";
-        achievements["5000"] = true;
-      } else if (count >= 1000 && !achievements["1000"]) {
-        msg.innerText = "🧠🔥 Поздравляю, ты сломал игру.";
-        achievements["1000"] = true;
-      } else if (count >= 500 && !achievements["500"]) {
-        msg.innerText = "💪 А ты серьёзный противник.";
-        achievements["500"] = true;
-      } else if (count >= 100 && !achievements["100"]) {
-        msg.innerText = "🎉 Молодец! Но ты можешь и лучше.";
-        achievements["100"] = true;
-      }
+function spawnBalls(number){
+  balls.forEach(b=>b.remove());
+  balls=[];
+  for(let i=0;i<number;i++){
+    createBall();
+  }
+}
 
-      localStorage.setItem('achievements', JSON.stringify(achievements));
-      updateAchievements();
-    }
+function createBall(){
+  const ball=document.createElement('div');
+  ball.className='ball';
+  const value=Math.floor(Math.random()*201)+30;
+  ball.innerText=value;
+  positionBall(ball);
+  document.body.appendChild(ball);
+  balls.push(ball);
+  ball.addEventListener('click',()=>{
+    ballsScore+=value;
+    document.getElementById('ballScore').innerText='Очки: '+ballsScore;
+    explodeBall(ball);
+    setTimeout(createBall,50);
+  });
+}
 
-    function updateAchievements() {
-      const list = [];
-      if (achievements["100"]) list.push("🎉 Молодец! Но ты можешь и лучше.");
-      if (achievements["500"]) list.push("💪 А ты серьёзный противник.");
-      if (achievements["1000"]) list.push("🧠🔥 Поздравляю, ты сломал игру.");
-      if (achievements["5000"]) list.push("👀 Как ты это делаешь?!");
-      if (achievements["10000"]) list.push("👨‍💻 Ах ты читер...");
-      if (achievements["five_seeds"]) list.push("Хмм, что это значит... Надеюсь, это шутка.");
-      document.getElementById("achievements").innerText = list.length > 0 ? list.join("\n") : "Нет достижений.";
-    }
+function positionBall(ball){
+  const x=Math.random()*(window.innerWidth-70);
+  const y=Math.random()*(window.innerHeight-150)+50;
+  ball.style.left=x+'px';
+  ball.style.top=y+'px';
+}
 
-    function resetProgress() {
-      count = 0;
-      achievements = {
-        "100": false,
-        "500": false,
-        "1000": false,
-        "5000": false,
-        "10000": false,
-        "five_seeds": false
-      };
-      usedCodes = [];
-      boosts = {
-        "x2": false,
-        "x5": false,
-        "x10": false
-      };
-      localStorage.setItem('count', count);
-      localStorage.setItem('achievements', JSON.stringify(achievements));
-      localStorage.setItem("usedPromoCodes", JSON.stringify(usedCodes));
-      localStorage.setItem("boosts", JSON.stringify(boosts));
-      document.getElementById('count').innerText = count;
-      document.getElementById('message').innerText = '';
-      updateAchievements();
-      closeModals();
-    }
+function explodeBall(ball){
+  for(let i=0;i<8;i++){
+    const p=document.createElement('div');
+    p.className='particle';
+    p.style.left=parseInt(ball.style.left)+30+'px';
+    p.style.top=parseInt(ball.style.top)+30+'px';
+    document.body.appendChild(p);
+    const angle=Math.random()*2*Math.PI;
+    const dist=30+Math.random()*20;
+    p.style.transform=`translate(${Math.cos(angle)*dist}px, ${Math.sin(angle)*dist}px)`;
+    setTimeout(()=>p.remove(),300);
+  }
+  ball.remove();
+  balls=balls.filter(b=>b!==ball);
+}
 
-    function showModal(id) {
-      closeModals();
-      const dropdown = document.getElementById('dropdown');
-      dropdown.classList.remove('show');
-      document.getElementById(`modal-${id}`).style.display = 'block';
-    }
-
-    function closeModals() {
-      document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
-    }
-
-    const menuBtn = document.getElementById('menu');
-    const dropdown = document.getElementById('dropdown');
-
-    menuBtn.addEventListener('click', () => {
-      dropdown.classList.toggle('show');
-    });
-
-    function toggleTheme() {
-      const dark = document.body.style.background === "rgb(255, 255, 255)";
-      document.body.style.background = dark ? "#111" : "#fff";
-      document.body.style.color = dark ? "#fff" : "#111";
-    }
-
-    const promoCodes = {
-      "SUNNYDAY": 500,
-      "BITEBYTE": 300,
-      "LUCKYCLAP": 700,
-      "PIXELRUSH": 250,
-      "COZYTAP": 400,
-      "TAPWAVE": 600,
-      "ZAPBOOM": 1000,
-      "QUIETPOWER": 350,
-      "TAPSTORM": 450,
-      "CLOUDYCODE": 150,
-      "NEONTAP": 200,
-      "BUBBLETAP": 550,
-      "GAMERGRIND": 800,
-      "EASYTAP": 100,
-      "FINALHIT": 900,
-      "221B": 221
-    };
-
-    function applyPromo() {
-      const input = document.getElementById("promoInput").value.trim().toUpperCase();
-      const msg = document.getElementById("promoMessage");
-
-      if (usedCodes.includes(input)) {
-        msg.innerText = "❗ Этот промокод уже использован.";
-        return;
-      }
-
-      if (input === "FIVEOSEEDS") {
-        msg.innerText = "Вам пришло письмо! Внутри письма 5 апельсиновых зёрнышек и надпись KKK";
-        count = 5;
-        achievements["five_seeds"] = true;
-        if (!usedCodes.includes(input)) usedCodes.push(input);
-        localStorage.setItem('count', count);
-        localStorage.setItem('achievements', JSON.stringify(achievements));
-        localStorage.setItem("usedPromoCodes", JSON.stringify(usedCodes));
-        updateAchievements();
-        document.getElementById('count').innerText = count;
-        return;
-      }
-
-      if (promoCodes[input]) {
-        count += promoCodes[input];
-        msg.innerText = `🎉 +${promoCodes[input]} очков!`;
-        usedCodes.push(input);
-        localStorage.setItem('count', count);
-        localStorage.setItem("usedPromoCodes", JSON.stringify(usedCodes));
-        document.getElementById('count').innerText = count;
-      } else {
-        msg.innerText = "❌ Неверный промокод.";
-      }
-    }
-
-    function buyBoost(type, price) {
-      const msg = document.getElementById("shopMessage");
-      if(count < price) {
-        msg.innerText = "❌ Недостаточно очков для покупки.";
-        return;
-      }
-      if(boosts[type]) {
-        msg.innerText = "❗ Буст уже куплен.";
-        return;
-      }
-      count -= price;
-      boosts[type] = true;
-      localStorage.setItem('count', count);
-      localStorage.setItem("boosts", JSON.stringify(boosts));
-      document.getElementById('count').innerText = count;
-      msg.innerText = `🎉 Вы купили буст ${type}!`;
-    }
-  </script>
+// Кнопка назад
+function backToTapiX(){
+  ballsActive=false;
+  document.getElementById('welcomeText').style.display='block';
+  document.getElementById('tapButton').style.display='block';
+  document.getElementById('count').style.display='block';
+  document.getElementById('message').style.display='block';
+  document.getElementById('dropdown').style.display='flex';
+  document.getElementById('backButton').style.display='none';
+  document.getElementById('ballScore').innerText='';
+  // Зачисляем очки в основной счет
+  count+=ballsScore;
+  localStorage.setItem('count', count);
+  document.getElementById('count').innerText=count;
+  updateAchievements();
+  balls.forEach(b=>b.remove());
+  balls=[];
+}
+</script>
 </body>
   </html>
